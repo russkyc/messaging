@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+        <AssemblyName>Russkyc.Messaging</AssemblyName>
+        <RootNamespace>Russkyc.Messaging</RootNamespace>
+    </PropertyGroup>
+    <PropertyGroup>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Title>Russkyc.Messaging</Title>
+        <Authors>russkyc</Authors>
+        <Description>The Messaging subset from CommunityToolkit.Mvvm independently packaged</Description>
+        <PackageTags>messaging community-toolkit pub sub</PackageTags>
+        <PackageIcon>PackageIcon.png</PackageIcon>
+        <PackageProjectUrl>https://github.com/russkyc/messaging</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/russkyc/messaging</RepositoryUrl>
+        <Version>1.0.0</Version>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
+    <ItemGroup>
+        <Resource Include="PackageIcon.png" Pack="true" PackagePath="" />
+    </ItemGroup>
+</Project>

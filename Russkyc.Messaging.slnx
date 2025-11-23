@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ConsoleSample/ConsoleSample.csproj" />
+  <Project Path="Russkyc.Messaging/Russkyc.Messaging.csproj" />
+</Solution>
