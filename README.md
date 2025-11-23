@@ -4,8 +4,8 @@
     <img src="https://img.shields.io/badge/-.NET%208.0-blueviolet?color=1f72de&label=NET" alt="">
     <img src="https://img.shields.io/badge/-.NET%209.0-blueviolet?color=1f72de&label=NET" alt="">
     <img src="https://img.shields.io/badge/-.NET%2010.0-blueviolet?color=1f72de&label=NET" alt="">
-    <img src="https://img.shields.io/github/license/russkyc/minimalapi-framework">
-    <img src="https://img.shields.io/github/issues/russkyc/minimalapi-framework">
+    <img src="https://img.shields.io/github/license/russkyc/messaging">
+    <img src="https://img.shields.io/github/issues/russkyc/messaging">
     <img src="https://img.shields.io/nuget/v/Russkyc.Messaging?color=1f72de" alt="Nuget">
     <img src="https://img.shields.io/nuget/dt/Russkyc.Messaging">
 </p>
