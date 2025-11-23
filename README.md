@@ -1,9 +1,16 @@
-﻿# Russkyc.Messaging
+﻿<h2 align="center">Russkyc.Messaging - Independently packaged Messaging subset from CommunityToolkit.MVVM</h2>
 
-[![NuGet](https://img.shields.io/nuget/v/Russkyc.Messaging.svg)](https://www.nuget.org/packages/Russkyc.Messaging/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+<p align="center">
+    <img src="https://img.shields.io/badge/-.NET%208.0-blueviolet?color=1f72de&label=NET" alt="">
+    <img src="https://img.shields.io/badge/-.NET%209.0-blueviolet?color=1f72de&label=NET" alt="">
+    <img src="https://img.shields.io/badge/-.NET%2010.0-blueviolet?color=1f72de&label=NET" alt="">
+    <img src="https://img.shields.io/github/license/russkyc/minimalapi-framework">
+    <img src="https://img.shields.io/github/issues/russkyc/minimalapi-framework">
+    <img src="https://img.shields.io/nuget/v/Russkyc.Messaging?color=1f72de" alt="Nuget">
+    <img src="https://img.shields.io/nuget/dt/Russkyc.Messaging">
+</p>
 
-A lightweight, high-performance messaging library extracted from the [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) project. This library provides a decoupled way for different parts of your application to communicate through messages, supporting both strong and weak reference implementations.
+The lightweight, high-performance messaging library extracted from the [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) project. This library provides a decoupled way for different parts of your application to communicate through messages, supporting both strong and weak reference implementations.
 
 ## Features
 
@@ -36,6 +43,12 @@ Install-Package Russkyc.Messaging
 ```csharp
 using Russkyc.Messaging;
 
+// In your main method or somewhere else
+var handler = new MessageHandler();
+
+// Send a message
+WeakReferenceMessenger.Default.Send(new UserLoggedInMessage("john_doe"));
+
 // Define a message
 public record UserLoggedInMessage(string Username);
 
@@ -53,12 +66,6 @@ public class MessageHandler
         Console.WriteLine($"User {message.Username} logged in!");
     }
 }
-
-// In your main method or somewhere else
-var handler = new MessageHandler();
-
-// Send a message
-WeakReferenceMessenger.Default.Send(new UserLoggedInMessage("john_doe"));
 ```
 
 ### Using Custom Messengers
@@ -83,9 +90,6 @@ messenger.Send(new UserLoggedInMessage("jane_doe"));
 ### Using Channels (Tokens)
 
 ```csharp
-// Define a token for a specific channel
-public class AdminChannel { }
-
 // Create a handler for admin messages
 var adminHandler = new object();
 
@@ -99,23 +103,22 @@ WeakReferenceMessenger.Default.Register<UserLoggedInMessage, AdminChannel>(
 WeakReferenceMessenger.Default.Send(
     new UserLoggedInMessage("admin"), 
     new AdminChannel());
+
+// Define a token for a specific channel
+public class AdminChannel { }
+
 ```
 
-### Request/Response Pattern
+## Request/Response Patterns
+
+The library supports both synchronous and asynchronous request/response messaging patterns using `RequestMessage<T>` and `AsyncRequestMessage<T>` respectively.
+
+### Synchronous Requests
+
+Synchronous requests allow you to send a message and immediately receive a response:
 
 ```csharp
-// Define a request message
-public class GetUserDataRequest : RequestMessage<UserData>
-{
-    public string UserId { get; init; }
-}
-
-// Define response data
-public class UserData
-{
-    public string Name { get; set; }
-    public string Email { get; set; }
-}
+using Russkyc.Messaging;
 
 // Create a handler for requests
 var requestHandler = new object();
@@ -131,7 +134,48 @@ WeakReferenceMessenger.Default.Register<GetUserDataRequest>(requestHandler, (rec
 // Send a request and get response
 var request = new GetUserDataRequest { UserId = "123" };
 var response = WeakReferenceMessenger.Default.Send(request);
-Console.WriteLine($"User: {response.Name}");
+Console.WriteLine($"User: {response.Name}, Email: {response.Email}");
+
+// Define a request message
+public class GetUserDataRequest : RequestMessage<UserData>
+{
+    public string UserId { get; init; }
+}
+
+// Define response data
+public class UserData
+{
+    public string Name { get; set; }
+    public string Email { get; set; }
+}
+```
+
+### Asynchronous Requests
+
+Asynchronous requests are useful when the response requires async operations like I/O:
+
+```csharp
+using Russkyc.Messaging;
+
+// Create a handler for async requests
+var asyncHandler = new object();
+
+// Handle async request
+WeakReferenceMessenger.Default.Register<AsyncDataRequest>(asyncHandler, async (recipient, message) =>
+{
+    // Simulate async data retrieval
+    await Task.Delay(100); // Simulate async work
+    var data = "Async data result";
+    message.Reply(data);
+});
+
+// Send async request
+var request = new AsyncDataRequest();
+var response = await WeakReferenceMessenger.Default.Send(request);
+Console.WriteLine($"Data: {response}");
+
+// Define an async request message
+public class AsyncDataRequest : AsyncRequestMessage<string> { }
 ```
 
 ## Messenger Types
@@ -158,36 +202,22 @@ var messenger = new WeakReferenceMessenger();
 var messenger = new StrongReferenceMessenger();
 ```
 
-## Advanced Usage
-
-### Async Messages
-
-```csharp
-// Define an async request message
-public class AsyncDataRequest : AsyncRequestMessage<string> { }
-
-// Create a handler for async requests
-var asyncHandler = new object();
-
-// Handle async request
-WeakReferenceMessenger.Default.Register<AsyncDataRequest>(asyncHandler, async (recipient, message) =>
-{
-    var data = await FetchDataAsync();
-    message.Reply(data);
-});
-
-// Send async request
-var request = new AsyncDataRequest();
-var response = await WeakReferenceMessenger.Default.Send(request);
-Console.WriteLine($"Data: {response}");
-```
-
 ## API Reference
 
 ### Core Interfaces
 
 - `IMessenger`: Main interface for messaging functionality
-- `IRecipient<TMessage>`: Interface for recipients that handle specific message types
+
+### Message Types
+
+The library provides several built-in message types for different communication patterns:
+
+- **RequestMessage<T>**: Synchronous request/response messaging. Handlers call `message.Reply(T response)` to send a response.
+- **AsyncRequestMessage<T>**: Asynchronous request/response messaging. Handlers call `message.Reply(T response)` after async operations.
+- **CollectionRequestMessage<T>**: Request for collections of data. Handlers call `message.Reply(IEnumerable<T> response)`.
+- **AsyncCollectionRequestMessage<T>**: Asynchronous request for collections. Handlers call `message.Reply(IEnumerable<T> response)`.
+- **PropertyChangedMessage<T>**: Notifies about property changes. Contains `PropertyName` and `OldValue`/`NewValue`.
+- **ValueChangedMessage<T>**: Notifies about value changes. Contains `OldValue` and `NewValue`.
 
 ### Key Methods
 
